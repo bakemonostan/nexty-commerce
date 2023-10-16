@@ -42,11 +42,11 @@ export const StoreModal = () => {
     try {
       setLoading(true);
       const response = await axios.post("/api/stores", values);
-      redirect("/");
     } catch (error) {
       toast.error("Something Wong");
     } finally {
       setLoading(false);
+      router.refresh();
       form.reset();
       toast.success("Store Created");
     }
