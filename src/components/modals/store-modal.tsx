@@ -2,6 +2,9 @@
 import * as z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { redirect, useRouter } from "next/navigation";
+import { useState } from "react";
+import axios from "axios";
 
 import { useStoreModal } from "@/hooks/use-store-modal";
 import { Modal } from "../ui/modal";
@@ -15,8 +18,7 @@ import {
 } from "../ui/form";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -37,7 +39,17 @@ export const StoreModal = () => {
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    console.log(values);
+    try {
+      setLoading(true);
+      const response = await axios.post("/api/stores", values);
+      redirect("/");
+    } catch (error) {
+      toast.error("Something Wong");
+    } finally {
+      setLoading(false);
+      form.reset();
+      toast.success("Store Created");
+    }
     // Create Store
   };
   return (
@@ -58,7 +70,11 @@ export const StoreModal = () => {
                   <FormItem>
                     <FormLabel> Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="E commerce" {...field} />
+                      <Input
+                        disabled={loading}
+                        placeholder="E commerce"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
